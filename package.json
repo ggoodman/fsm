@@ -1,0 +1,27 @@
+{
+  "name": "fsm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ggoodman/fsm.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ggoodman/fsm/issues"
+  },
+  "homepage": "https://github.com/ggoodman/fsm#readme",
+  "devDependencies": {
+    "prettier": "^2.0.5",
+    "typescript": "^4.1.0-dev.20200810"
+  },
+  "dependencies": {
+    "ts-primitives": "^3.1.0"
+  }
+}
