@@ -1,6 +1,6 @@
 import { Service } from './service';
-import { DefineEvent } from './types/events';
-import { DefineState } from './types/states';
+import type { DefineEvent } from './types/events';
+import type { DefineState } from './types/states';
 
 export function fromTask<T = unknown, TError = unknown>(task: () => Promise<T>) {
   type Initial = DefineState<'initial', () => Promise<T>>;

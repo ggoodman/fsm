@@ -1,6 +1,6 @@
-import { IDisposable } from 'ts-primitives';
-import { AnyEvent, EventWithoutData } from './events';
-import { AnyState, StateWithoutData } from './states';
+import type { IDisposable } from 'ts-primitives';
+import type { AnyEvent, EventWithoutData } from './events';
+import type { AnyState, StateWithoutData } from './states';
 
 export interface OnEnterContext<
   TState extends AnyState,

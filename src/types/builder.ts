@@ -1,6 +1,6 @@
-import { OnEnterContext, OnEventContext, OnExitContext } from './context';
-import { AnyEvent } from './events';
-import { AnyState } from './states';
+import type { OnEnterContext, OnEventContext, OnExitContext } from './context';
+import type { AnyEvent } from './events';
+import type { AnyState } from './states';
 
 export type OnEnterHandler<
   TState extends AnyState,

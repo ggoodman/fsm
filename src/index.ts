@@ -1,5 +1,7 @@
-import { Service } from './service';
-import { DefineEvent } from './types/events';
-import { DefineState } from './types/states';
+export * from './types/builder';
+export * from './types/context';
+export type { Service } from './service';
+export type { DefineEvent } from './types/events';
+export type { DefineState } from './types/states';
 
-export { Service, DefineEvent, DefineState };
+export { defineCompoundState } from './builder';

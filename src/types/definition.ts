@@ -1,6 +1,6 @@
-import { OnEnterHandler, OnEventHandler, OnExitHandler } from './builder';
-import { AnyEvent } from './events';
-import { AnyState } from './states';
+import type { OnEnterHandler, OnEventHandler, OnExitHandler } from './builder';
+import type { AnyEvent } from './events';
+import type { AnyState } from './states';
 
 export interface AtomicStateDefinition<
   TState extends AnyState,

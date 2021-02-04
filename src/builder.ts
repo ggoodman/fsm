@@ -1,4 +1,3 @@
-import { IDisposable } from 'ts-primitives';
 import type {
   AtomicStateBuilder,
   CompoundStateBuilder,
@@ -6,16 +5,15 @@ import type {
   OnEventHandler,
   OnExitHandler,
 } from './types/builder';
-import { AtomicStateDefinition, CompoundStateDefinition } from './types/definition';
-import { AnyEvent } from './types/events';
-import { AnyState } from './types/states';
+import type { AtomicStateDefinition, CompoundStateDefinition } from './types/definition';
+import type { AnyEvent } from './types/events';
+import type { AnyState } from './types/states';
 
 class AtomicStateBuilderImpl<
   TState extends AnyState,
   TEvent extends AnyEvent,
   TCurrentState extends TState = TState
->
-  implements
+> implements
     AtomicStateBuilder<TState, TEvent, TCurrentState>,
     AtomicStateDefinition<TState, TEvent, TCurrentState> {
   public readonly onEnterCallbacks: AtomicStateDefinition<
@@ -64,10 +62,11 @@ class AtomicStateBuilderImpl<
 }
 
 class CompoundBuilderImpl<
-  TState extends AnyState,
-  TEvent extends AnyEvent,
-  TCurrentState extends TState = TState
-> extends AtomicStateBuilderImpl<TState, TEvent, TCurrentState>
+    TState extends AnyState,
+    TEvent extends AnyEvent,
+    TCurrentState extends TState = TState
+  >
+  extends AtomicStateBuilderImpl<TState, TEvent, TCurrentState>
   implements
     CompoundStateBuilder<TState, TEvent, TCurrentState>,
     CompoundStateDefinition<TState, TEvent, TCurrentState> {

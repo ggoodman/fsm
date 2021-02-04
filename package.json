@@ -1,30 +1,41 @@
 {
-  "name": "fsm",
+  "name": "@ggoodman/fsm",
   "version": "0.0.0",
   "description": "Fully typed finite state machine for JavaScript and TypeScript",
   "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build": "node ./scripts/build.js",
     "test": "jest"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ggoodman/fsm.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "typed",
+    "fsm",
+    "state machine",
+    "statemachine"
+  ],
+  "author": "Geoff Goodman",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/ggoodman/fsm/issues"
   },
   "homepage": "https://github.com/ggoodman/fsm#readme",
   "devDependencies": {
+    "esbuild": "^0.8.39",
     "jest": "^26.4.2",
     "prettier": "^2.0.5",
+    "rollup": "^2.38.4",
+    "rollup-plugin-dts": "^2.0.1",
     "ts-jest": "^26.3.0",
-    "typescript": "^4.0.2"
+    "typescript": "^4.1.3"
   },
   "dependencies": {
-    "ts-primitives": "^3.1.0"
+    "ts-primitives": "^3.2.0"
   },
   "prettier": {
     "printWidth": 100,

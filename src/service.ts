@@ -1,10 +1,10 @@
 import { DisposableStore, Emitter, IDisposable } from 'ts-primitives';
 import { defineCompoundState } from './builder';
-import { CompoundStateBuilder } from './types/builder';
-import { OnEnterContext, OnEventContext, OnExitContext } from './types/context';
-import { CompoundStateDefinition } from './types/definition';
-import { AnyEvent, EventWithoutData } from './types/events';
-import { AnyState, StateWithoutData } from './types/states';
+import type { CompoundStateBuilder } from './types/builder';
+import type { OnEnterContext, OnEventContext, OnExitContext } from './types/context';
+import type { CompoundStateDefinition } from './types/definition';
+import type { AnyEvent, EventWithoutData } from './types/events';
+import type { AnyState, StateWithoutData } from './types/states';
 
 enum RunState {
   Initial,
