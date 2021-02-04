@@ -1,6 +1,6 @@
 import { OnEnterContext, OnEventContext, OnExitContext } from './context';
 import { AnyEvent } from './events';
-import { AnyState } from './states';
+import { AnyState, ExtractCompoundState, StateKind } from './states';
 
 export type OnEnterHandler<
   TState extends AnyState,
@@ -41,19 +41,32 @@ export interface AtomicStateBuilder<
 export interface CompoundStateBuilder<
   TState extends AnyState,
   TEvent extends AnyEvent,
-  TCurrentState extends TState = TState
+  TCurrentState extends TState = TState,
+  TTargetState extends AnyState = TState
 > extends AtomicStateBuilder<TState, TEvent, TCurrentState> {
-  defineFinalState<TDefinedStateId extends TState['id']>(
+  defineCompoundState<TDefinedStateId extends ExtractCompoundState<TCurrentState>['id']>(
     id: TDefinedStateId,
     builderFn?: (
-      builder: AtomicStateBuilder<TState, TEvent, Extract<TState, { id: TDefinedStateId }>>
+      builder: CompoundStateBuilder<
+        ExtractCompoundState<TCurrentState>['childStates'],
+        TEvent,
+        Extract<ExtractCompoundState<TCurrentState>['childStates'], { id: TDefinedStateId }>,
+        TTargetState
+      >
     ) => void
   ): this;
 
-  defineState<TDefinedStateId extends TState['id']>(
+  defineFinalState<TDefinedStateId extends TState['id']>(
     id: TDefinedStateId,
     builderFn?: (
-      builder: AtomicStateBuilder<TState, TEvent, Extract<TState, { id: TDefinedStateId }>>
+      builder: AtomicStateBuilder<TTargetState, TEvent, Extract<TState, { id: TDefinedStateId }>>
+    ) => void
+  ): this;
+
+  defineState<TDefinedStateId extends Extract<TState, { type: StateKind.Atomic }>['id']>(
+    id: TDefinedStateId,
+    builderFn?: (
+      builder: AtomicStateBuilder<TTargetState, TEvent, Extract<TState, { id: TDefinedStateId }>>
     ) => void
   ): this;
 }

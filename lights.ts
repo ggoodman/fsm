@@ -1,6 +1,10 @@
 import { DefineEvent, DefineState, Service } from './src';
+import { DefineCompoundState } from './src/types/states';
 
-type Red = DefineState<'red'>;
+type PedWalk = DefineState<'walk'>;
+type PedWarn = DefineState<'warn'>;
+
+type Red = DefineCompoundState<'red', PedWalk | PedWarn>;
 type Yellow = DefineState<'yellow'>;
 type Green = DefineState<'green'>;
 
@@ -9,7 +13,7 @@ type Tick = DefineEvent<'tick'>;
 const service = Service.define<Red | Yellow | Green, Tick>(
   (s) =>
     s
-      .defineState('red', (red) =>
+      .defineCompoundState('red', (red) =>
         red
           .onEnter((ctx) => ctx.runAfter(30 * 100, (ctx) => ctx.send('tick')))
           .onEvent('tick', (ctx) => ctx.transitionTo('green'))
