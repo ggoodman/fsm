@@ -88,17 +88,18 @@ export class Service<TState extends AnyState, TEvent extends AnyEvent> {
 
     this.runState = RunState.Started;
 
-    this.runCallbacks(
-      this.def.onEnterCallbacks,
-      () =>
-        new OnEnterContextImpl(
-          this.internalState,
-          undefined,
-          this.sendEventInternal.bind(this),
-          this.transitionTo.bind(this),
-          this.currentStateDisposables
-        )
-    );
+    this.runCallbacks(this.def.onEnterCallbacks, () => {
+      const ctx = new OnEnterContextImpl(
+        this.internalState,
+        undefined,
+        this.sendEventInternal.bind(this),
+        this.transitionTo.bind(this)
+      );
+
+      this.currentStateDisposables.add(ctx);
+
+      return ctx;
+    });
 
     this.handleOnEnter();
   }
@@ -146,17 +147,18 @@ export class Service<TState extends AnyState, TEvent extends AnyEvent> {
     const currentStateId: TState['id'] = this.internalState.id;
     const stateDef = this.def.states[currentStateId];
 
-    this.runCallbacks(
-      stateDef?.onEnterCallbacks,
-      () =>
-        new OnEnterContextImpl(
-          this.internalState,
-          event,
-          this.sendEventInternal.bind(this),
-          this.transitionTo.bind(this),
-          this.currentStateDisposables
-        )
-    );
+    this.runCallbacks(stateDef?.onEnterCallbacks, () => {
+      const ctx = new OnEnterContextImpl(
+        this.internalState,
+        event,
+        this.sendEventInternal.bind(this),
+        this.transitionTo.bind(this)
+      );
+
+      this.currentStateDisposables.add(ctx);
+
+      return ctx;
+    });
   }
 
   private handleOnEvent(event: TEvent) {
@@ -169,14 +171,18 @@ export class Service<TState extends AnyState, TEvent extends AnyEvent> {
         ...(stateDef?.onEventCallbacks[event.id] ?? []),
         ...(this.def.onEventCallbacks[event.id] ?? []),
       ],
-      () =>
-        new OnEventContextImpl(
+      () => {
+        const ctx = new OnEventContextImpl(
           this.internalState,
           event,
           this.sendEventInternal.bind(this),
-          this.transitionTo.bind(this),
-          this.currentStateDisposables
-        )
+          this.transitionTo.bind(this)
+        );
+
+        this.currentStateDisposables.add(ctx);
+
+        return ctx;
+      }
     );
   }
 
@@ -190,7 +196,7 @@ export class Service<TState extends AnyState, TEvent extends AnyEvent> {
     );
   }
 
-  private runCallbacks<TContext>(
+  private runCallbacks<TContext extends IDisposable>(
     callbacks: undefined | Array<(ctx: TContext) => void>,
     ctxFactory: () => TContext
   ) {
@@ -271,53 +277,124 @@ export class Service<TState extends AnyState, TEvent extends AnyEvent> {
 
 class OnEnterContextImpl<TState extends AnyState, TEvent extends AnyEvent>
   implements OnEnterContext<TState, TEvent> {
+  private isDisposed = false;
+  private readonly stateDisposer = new DisposableStore();
+
   constructor(
     readonly state: TState,
     readonly event: TEvent | undefined,
-    readonly send: (event: EventWithoutData<TEvent>['id'] | TEvent) => void,
-    readonly transitionTo: (state: StateWithoutData<TState>['id'] | TState) => void,
-    private readonly stateDisposer: DisposableStore
+    private readonly _send: (event: EventWithoutData<TEvent>['id'] | TEvent) => void,
+    private readonly _transitionTo: (state: StateWithoutData<TState>['id'] | TState) => void
   ) {}
 
+  dispose() {
+    this.isDisposed = true;
+    this.stateDisposer.dispose();
+  }
+
   registerDisposable(disposable: IDisposable) {
+    if (this.isDisposed) {
+      return;
+    }
+
     this.stateDisposer.add(disposable);
   }
 
   runAfter(delay: number, handler: (ctx: OnEnterContext<TState, TEvent>) => void) {
+    if (this.isDisposed) {
+      return;
+    }
+
     this.registerDisposable(disposableSetTimeout(() => handler(this), delay));
   }
 
   runEvery(interval: number, handler: (ctx: OnEnterContext<TState, TEvent>) => void) {
+    if (this.isDisposed) {
+      return;
+    }
+
     this.registerDisposable(disposableSetInterval(() => handler(this), interval));
+  }
+
+  send(event: EventWithoutData<TEvent>['id'] | TEvent): void {
+    if (this.isDisposed) {
+      return;
+    }
+
+    this._send(event);
+  }
+
+  transitionTo(state: StateWithoutData<TState>['id'] | TState): void {
+    if (this.isDisposed) {
+      return;
+    }
+
+    this._transitionTo(state);
   }
 }
 
 class OnEventContextImpl<TState extends AnyState, TEvent extends AnyEvent>
-  implements OnEventContext<TState, TEvent> {
+  implements OnEventContext<TState, TEvent>, IDisposable {
+  private isDisposed = false;
+  private readonly stateDisposer = new DisposableStore();
+
   constructor(
     readonly state: TState,
     readonly event: TEvent,
-    readonly send: (event: EventWithoutData<TEvent>['id'] | TEvent) => void,
-    readonly transitionTo: (state: StateWithoutData<TState>['id'] | TState) => void,
-    private readonly stateDisposer: DisposableStore
+    private readonly _send: (event: EventWithoutData<TEvent>['id'] | TEvent) => void,
+    private readonly _transitionTo: (state: StateWithoutData<TState>['id'] | TState) => void
   ) {}
 
+  dispose() {
+    this.isDisposed = true;
+    this.stateDisposer.dispose();
+  }
+
   registerDisposable(disposable: IDisposable) {
+    if (this.isDisposed) {
+      return;
+    }
+
     this.stateDisposer.add(disposable);
   }
 
   runAfter(delay: number, handler: (ctx: OnEventContext<TState, TEvent>) => void) {
+    if (this.isDisposed) {
+      return;
+    }
+
     this.registerDisposable(disposableSetTimeout(() => handler(this), delay));
   }
 
   runEvery(interval: number, handler: (ctx: OnEventContext<TState, TEvent>) => void) {
+    if (this.isDisposed) {
+      return;
+    }
+
     this.registerDisposable(disposableSetInterval(() => handler(this), interval));
+  }
+
+  send(event: EventWithoutData<TEvent>['id'] | TEvent): void {
+    if (this.isDisposed) {
+      return;
+    }
+
+    this._send(event);
+  }
+
+  transitionTo(state: StateWithoutData<TState>['id'] | TState): void {
+    if (this.isDisposed) {
+      return;
+    }
+
+    this._transitionTo(state);
   }
 }
 
 class OnExitContextImpl<TState extends AnyState, TEvent extends AnyEvent>
-  implements OnExitContext<TState, TEvent> {
+  implements OnExitContext<TState, TEvent>, IDisposable {
   constructor(readonly state: TState, readonly event?: TEvent) {}
+  dispose() {}
 }
 
 function disposableSetInterval(

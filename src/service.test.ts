@@ -150,6 +150,64 @@ describe('service', () => {
     expect(service.state.id).toEqual('final');
   });
 
+  it('will not process events emitted on a stale context', async () => {
+    let resolve: () => void | undefined;
+    let timeoutFired = new Promise<void>((_resolve) => {
+      resolve = _resolve;
+    });
+    const service = Service.define(
+      (builder) =>
+        builder
+          .onEvent('never', (ctx) => ctx.transitionTo({ id: 'never', data: undefined }))
+          .onEvent('final', (ctx) => ctx.transitionTo({ id: 'final', data: undefined }))
+          .defineState('initial', (state) =>
+            state.onEnter((ctx) => {
+              setTimeout(() => {
+                ctx.send('never');
+                resolve();
+              });
+              ctx.send('final');
+            })
+          )
+          .defineState('final')
+          .defineState('never'),
+      { id: 'initial', data: undefined }
+    );
+
+    expect(service.state.id).toEqual('initial');
+    service.start();
+    await timeoutFired;
+    expect(service.state.id).toEqual('final');
+  });
+
+  it('will not process transitions using a stale context', async () => {
+    let resolve: () => void | undefined;
+    let timeoutFired = new Promise<void>((_resolve) => {
+      resolve = _resolve;
+    });
+    const service = Service.define(
+      (builder) =>
+        builder
+          .defineState('initial', (state) =>
+            state.onEnter((ctx) => {
+              setTimeout(() => {
+                ctx.transitionTo('never');
+                resolve();
+              });
+              ctx.transitionTo('final');
+            })
+          )
+          .defineState('final')
+          .defineState('never'),
+      { id: 'initial', data: undefined }
+    );
+
+    expect(service.state.id).toEqual('initial');
+    service.start();
+    await timeoutFired;
+    expect(service.state.id).toEqual('final');
+  });
+
   it('will not process further transitions when on a final state', () => {
     const service = Service.define(
       (builder) =>

@@ -7,7 +7,12 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "node ./scripts/build.js",
-    "test": "jest"
+    "test": "jest",
+    "posttest": "kacl lint",
+    "prepack": "npm run build",
+    "preversion": "kacl prerelease",
+    "version": "kacl release && git add CHANGELOG.md",
+    "postversion": "git push --follow-tags && gh-release"
   },
   "repository": {
     "type": "git",
@@ -27,7 +32,9 @@
   "homepage": "https://github.com/ggoodman/fsm#readme",
   "devDependencies": {
     "esbuild": "^0.8.39",
+    "gh-release": "^5.0.0",
     "jest": "^26.4.2",
+    "kacl": "^1.0.0",
     "prettier": "^2.0.5",
     "rollup": "^2.38.4",
     "rollup-plugin-dts": "^2.0.1",

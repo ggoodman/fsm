@@ -6,7 +6,7 @@ export interface OnEnterContext<
   TState extends AnyState,
   TEvent extends AnyEvent,
   TCurrentState extends AnyState = TState
-> {
+> extends IDisposable {
   event?: Readonly<TEvent>;
   state: Readonly<TCurrentState>;
 
@@ -32,7 +32,7 @@ export interface OnEventContext<
   TEvent extends AnyEvent,
   TCurrentState extends AnyState = TState,
   TCurrentEvent extends TEvent = TEvent
-> {
+> extends IDisposable {
   event: Readonly<TCurrentEvent>;
   state: Readonly<TCurrentState>;
 
@@ -57,7 +57,7 @@ export interface OnExitContext<
   TState extends AnyState,
   TEvent extends AnyEvent,
   TCurrentState extends AnyState = TState
-> {
+> extends IDisposable {
   event?: Readonly<TEvent>;
   state: Readonly<TCurrentState>;
 }
