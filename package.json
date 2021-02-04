@@ -1,6 +1,6 @@
 {
   "name": "@ggoodman/fsm",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Fully typed finite state machine for JavaScript and TypeScript",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
